@@ -74,10 +74,23 @@ export async function GET() {
       services: services || [],
       testimonials: testimonials || [],
       projects: (projects || []).map((project) => ({
-        ...project,
-        galleryImages: projectGallery
-          ?.filter((gallery) => gallery.project_id === project.id)
-          .map((gallery) => gallery.image_url) || [],
+        id: project.id,
+        title: project.title,
+        category: project.category,
+        year: project.year,
+        description: project.description,
+        coverImage: project.cover_image || project.coverImage || '',
+        galleryImages:
+          projectGallery
+            ?.filter((gallery) => gallery.project_id === project.id)
+            .map((gallery) => gallery.image_url) ||
+          project.galleryImages ||
+          [],
+        client: project.client,
+        objective: project.objective,
+        challenge: project.challenge,
+        solution: project.solution,
+        sort_order: project.sort_order,
       })),
       about: aboutContent
         ? {
