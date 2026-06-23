@@ -1,0 +1,73 @@
+{
+  "site": {
+    "name": "dois.du",
+    "description": "Estúdio de design gráfico especializado em Identidade Visual, Social Media e Materiais Gráficos para Impressão"
+  },
+  "siteSettings": {
+    "id": 1,
+    "site_name": "dois.du",
+    "site_description": "Estúdio de design gráfico especializado em Identidade Visual, Social Media e Materiais Gráficos para Impressão",
+    "contact_email": "eduardo.doisdu@gmail.com",
+    "whatsapp_number": "5554996418178",
+    "instagram_link": "https://www.instagram.com/dois.du/",
+    "facebook_link": "https://www.facebook.com/2dois.du",
+    "linkedin_link": "https://www.linkedin.com/in/eduardo-luiz-gobbi/",
+    "behance_link": "https://www.behance.net/eduardogobbi"
+  },
+  "home": {
+    "id": 1,
+    "title": "Test Update - 2:22:09 pm",
+    "description": "Estúdio de design gráfico especializado em Identidade Visual, Social Media e Materiais Gráficos para Impressão."
+  },
+  "services": [
+    {
+      "id": 1,
+      "title": "Identidade Visual",
+      "description": "Criação de marca, redesign e manual de marca completo.",
+      "sort_order": 0
+    },
+    {
+      "id": 2,
+      "title": "Social Media",
+      "description": "Planejamento visual, design para redes sociais e campanhas.",
+      "sort_order": 1
+    },
+    {
+      "id": 3,
+      "title": "Materiais Impressos",
+      "description": "Cartões, catálogos, flyers, banners e muito mais.",
+      "sort_order": 2
+    }
+  ],
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Ana Silva",
+      "company": "Loja Moderna",
+      "text": "Trabalho incrível! A identidade visual ficou exatamente como imaginávamos.",
+      "sort_order": 0
+    },
+    {
+      "id": 2,
+      "name": "Carlos Costa",
+      "company": "Café Doce",
+      "text": "Profissionalismo e criatividade em cada detalhe. Recomendo muito!",
+      "sort_order": 1
+    },
+    {
+      "id": 3,
+      "name": "Maria Souza",
+      "company": "Studio Beauty",
+      "text": "Resultado superou nossas expectativas. Parabéns pelo trabalho!",
+      "sort_order": 2
+    }
+  ],
+  "projects": [],
+  "about": {
+    "title": "Quem é Eduardo?",
+    "description1": "Sou o fundador do estúdio dois.du, apaixonado por design gráfico e por transformar ideias em realidade visual. Com anos de experiência no mercado, desenvolvi projetos para diversos clientes, sempre buscando qualidade e atenção aos detalhes.",
+    "description2": "A dois.du nasceu com a missão de criar identidades visuais fortes e memoráveis, que realmente representem a essência de cada marca.",
+    "philosophy": "Nossa Filosofia",
+    "philosophyText": "Criatividade aliada a estratégia, sempre focada nos resultados do cliente. Cada projeto é único e desenvolvido com muito cuidado e dedicação."
+  }
+}
