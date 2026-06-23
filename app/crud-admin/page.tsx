@@ -78,17 +78,33 @@ export default function CrudAdmin() {
     void checkAuth();
   }, []);
 
+  const getResponsePayload = async (response: Response) => {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      return response.json().catch(() => null);
+    }
+
+    return null;
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/data', { cache: 'no-store' });
+      const result = await getResponsePayload(res);
+
       if (!res.ok) {
-        const error = await res.json();
-        setMessage(error.message || 'Erro ao carregar dados');
+        setMessage(result?.message || 'Erro ao carregar dados');
         return;
       }
-      const data = await res.json();
-      setData(data);
+
+      if (!result) {
+        setMessage('Resposta inválida ao carregar dados');
+        return;
+      }
+
+      setData(result);
       setMessage('');
     } catch (error) {
       console.error('Error loading data:', error);
@@ -139,13 +155,13 @@ export default function CrudAdmin() {
         body: JSON.stringify({ username, password })
       });
 
-      const result = await res.json();
-      if (result.success) {
+      const result = await getResponsePayload(res);
+      if (res.ok && result?.success) {
         setIsLoggedIn(true);
         setPassword('');
         await loadData();
       } else {
-        setMessage(result.message || 'Credenciais inválidas!');
+        setMessage(result?.message || 'Credenciais inválidas!');
       }
     } catch (error) {
       console.error('Error logging in:', error);
@@ -184,16 +200,16 @@ export default function CrudAdmin() {
         body: JSON.stringify(data)
       });
 
-      const result = await res.json();
+      const result = await getResponsePayload(res);
       if (res.status === 401) {
         handleUnauthorized();
         return;
       }
 
-      if (result.success) {
+      if (res.ok && result?.success) {
         setMessage('Dados salvos com sucesso!');
       } else {
-        setMessage(result.message || 'Erro ao salvar dados');
+        setMessage(result?.message || 'Erro ao salvar dados');
       }
     } catch (error) {
       console.error('Error saving data:', error);

@@ -5,6 +5,8 @@ import {
   setAdminSession,
 } from '@/lib/admin-session';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const session = getAdminSession(request);
 

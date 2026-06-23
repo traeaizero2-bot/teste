@@ -7,6 +7,8 @@ import {
   hasSupabaseServerConfig,
 } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 function throwIfError(
   error: { message?: string } | null,
   context: string
