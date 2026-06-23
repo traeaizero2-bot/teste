@@ -13,6 +13,7 @@ type Project = {
   year: number;
   description: string;
   coverImage: string;
+  cover_image?: string;
   galleryImages: string[];
   client: string;
   objective: string;
@@ -51,6 +52,7 @@ export default function Projeto() {
   }
 
   const project = data.projects.find(p => p.id === Number(params.id));
+  const coverSrc = project?.coverImage || project?.cover_image || '';
 
   if (!project) {
     return <div>Projeto não encontrado</div>;
@@ -69,11 +71,17 @@ export default function Projeto() {
             <h1 className="text-3xl md:text-4xl font-bold text-black-primary">{project.title}</h1>
             <p className="text-base md:text-lg text-gray-600 mt-2">{project.category} • {project.year}</p>
             <div className="mt-6 md:mt-8 aspect-video bg-gray-light rounded-2xl overflow-hidden border border-gray-200">
-              <img 
-                src={project.coverImage} 
-                alt={project.title}
-                className="w-full h-full object-cover"
-              />
+              {coverSrc ? (
+                <img 
+                  src={coverSrc} 
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  Imagem indisponível
+                </div>
+              )}
             </div>
           </motion.div>
 
