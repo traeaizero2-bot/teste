@@ -1,10 +1,25 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import fallbackData from '@/content/data.json';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    throw new Error('Supabase environment variables are not configured.');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey);
+}
+
+function hasSupabaseConfig() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 function isAuthenticated(request: Request) {
   const cookie = request.headers.get('cookie');
@@ -12,7 +27,13 @@ function isAuthenticated(request: Request) {
 }
 
 export async function GET() {
+  if (!hasSupabaseConfig()) {
+    return NextResponse.json(fallbackData);
+  }
+
   try {
+    const supabase = getSupabaseClient();
+
     // Fetch all data from separate tables
     const [
       { data: siteSettings },
@@ -75,7 +96,15 @@ export async function PUT(request: Request) {
     );
   }
 
+  if (!hasSupabaseConfig()) {
+    return NextResponse.json(
+      { success: false, message: 'Supabase não configurado no ambiente.' },
+      { status: 500 }
+    );
+  }
+
   try {
+    const supabase = getSupabaseClient();
     const newData = await request.json();
 
     // Update site settings

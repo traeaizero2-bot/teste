@@ -6,19 +6,6 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import BreadcrumbListSchema from '@/components/schema/BreadcrumbListSchema';
 import ServiceSchema from '@/components/schema/ServiceSchema';
-import { type Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Landing Pages em Porto Alegre | dois.du',
-  description: 'Crie landing pages de alta conversão para suas campanhas em Porto Alegre, RS. Páginas otimizadas para capturar leads e aumentar vendas. Orçamento gratuito!',
-  keywords: 'landing page Porto Alegre, página de captura RS, landing page de alta conversão, página de vendas',
-  openGraph: {
-    title: 'Landing Pages em Porto Alegre | dois.du',
-    description: 'Crie landing pages de alta conversão para suas campanhas em Porto Alegre, RS. Páginas otimizadas para capturar leads e aumentar vendas.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://doisdu.com.br'}/landing-pages`,
-    type: 'website',
-  }
-};
 
 export default function LandingPages() {
   return (

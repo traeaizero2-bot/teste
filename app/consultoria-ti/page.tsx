@@ -6,19 +6,6 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import BreadcrumbListSchema from '@/components/schema/BreadcrumbListSchema';
 import ServiceSchema from '@/components/schema/ServiceSchema';
-import { type Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Consultoria de TI em Porto Alegre | dois.du',
-  description: 'Consultoria especializada em tecnologia da informação para empresas em Porto Alegre, RS. Planeje sua infraestrutura de TI com estratégia. Orçamento gratuito!',
-  keywords: 'consultoria TI Porto Alegre, consultoria de tecnologia RS, planejamento de TI, infraestrutura de TI',
-  openGraph: {
-    title: 'Consultoria de TI em Porto Alegre | dois.du',
-    description: 'Consultoria especializada em tecnologia da informação para empresas em Porto Alegre, RS. Planeje sua infraestrutura de TI com estratégia.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://doisdu.com.br'}/consultoria-ti`,
-    type: 'website',
-  }
-};
 
 export default function ConsultoriaTI() {
   return (
