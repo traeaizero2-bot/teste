@@ -1,21 +1,49 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  clearAdminSession,
+  getAdminSession,
+  setAdminSession,
+} from '@/lib/admin-session';
 
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
+  const session = getAdminSession(request);
+
+  if (!session) {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  }
+
+  return NextResponse.json({
+    authenticated: true,
+    username: session.username,
+  });
+}
+
+export async function POST(request: NextRequest) {
   const { username, password } = await request.json();
-  
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    // Create a simple cookie session
+  if (!adminUsername || !adminPassword) {
+    return NextResponse.json(
+      { success: false, message: 'Credenciais do admin não configuradas.' },
+      { status: 500 }
+    );
+  }
+
+  if (username === adminUsername && password === adminPassword) {
     const response = NextResponse.json({ success: true });
-    response.cookies.set('admin_session', 'true', { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7 // 1 week
-    });
+    setAdminSession(response, adminUsername);
     return response;
   }
 
-  return NextResponse.json({ success: false, message: 'Credenciais inválidas' }, { status: 401 });
+  return NextResponse.json(
+    { success: false, message: 'Credenciais inválidas' },
+    { status: 401 }
+  );
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  clearAdminSession(response);
+  return response;
 }

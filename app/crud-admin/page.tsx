@@ -2,7 +2,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 type Project = {
   id: number;
@@ -43,6 +42,7 @@ type Data = {
 };
 
 export default function CrudAdmin() {
+  const [authChecked, setAuthChecked] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -53,18 +53,35 @@ export default function CrudAdmin() {
 
   // Check if logged in on load
   useEffect(() => {
-    const checkAuth = () => {
-      const hasSession = document.cookie.includes('admin_session=true');
-      setIsLoggedIn(hasSession);
-      if (hasSession) loadData();
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth', { cache: 'no-store' });
+        const result = await res.json().catch(() => null);
+
+        if (res.ok && result?.authenticated) {
+          setIsLoggedIn(true);
+          await loadData();
+        } else {
+          setIsLoggedIn(false);
+          setData(null);
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setMessage('Erro ao validar sessão do admin');
+        setIsLoggedIn(false);
+        setData(null);
+      } finally {
+        setAuthChecked(true);
+      }
     };
-    checkAuth();
+
+    void checkAuth();
   }, []);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/data');
+      const res = await fetch('/api/data', { cache: 'no-store' });
       if (!res.ok) {
         const error = await res.json();
         setMessage(error.message || 'Erro ao carregar dados');
@@ -79,6 +96,35 @@ export default function CrudAdmin() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUnauthorized = () => {
+    setIsLoggedIn(false);
+    setData(null);
+    setMessage('Sessão expirada. Faça login novamente.');
+  };
+
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/admin/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await res.json().catch(() => null);
+
+    if (res.status === 401) {
+      handleUnauthorized();
+      return null;
+    }
+
+    if (!res.ok || !result?.success || !result?.publicUrl) {
+      setMessage(result?.message || 'Erro ao fazer upload da imagem');
+      return null;
+    }
+
+    return result.publicUrl as string;
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -96,9 +142,10 @@ export default function CrudAdmin() {
       const result = await res.json();
       if (result.success) {
         setIsLoggedIn(true);
-        loadData();
+        setPassword('');
+        await loadData();
       } else {
-        setMessage('Credenciais inválidas!');
+        setMessage(result.message || 'Credenciais inválidas!');
       }
     } catch (error) {
       console.error('Error logging in:', error);
@@ -108,9 +155,21 @@ export default function CrudAdmin() {
     }
   };
 
-  const handleLogout = () => {
-    document.cookie = 'admin_session=; Max-Age=0; path=/';
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    setLoading(true);
+
+    try {
+      await fetch('/api/auth', { method: 'DELETE' });
+    } catch (error) {
+      console.error('Error logging out:', error);
+    } finally {
+      setIsLoggedIn(false);
+      setData(null);
+      setUsername('');
+      setPassword('');
+      setMessage('');
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -126,6 +185,11 @@ export default function CrudAdmin() {
       });
 
       const result = await res.json();
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
       if (result.success) {
         setMessage('Dados salvos com sucesso!');
       } else {
@@ -138,6 +202,14 @@ export default function CrudAdmin() {
       setLoading(false);
     }
   };
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Verificando acesso...
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
@@ -423,27 +495,22 @@ export default function CrudAdmin() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        if (!supabase) {
-                          setMessage('Supabase não configurado para upload');
-                          return;
-                        }
-                        const fileName = `${Date.now()}-${file.name}`;
-                        const { data: uploadData, error } = await supabase.storage
-                          .from('portfolio-images')
-                          .upload(fileName, file);
-                        if (error || !uploadData) {
-                          console.error('Error uploading file:', error);
-                          setMessage('Erro ao fazer upload da imagem');
-                          return;
-                        }
 
-                        const { data: { publicUrl } } = supabase.storage
-                          .from('portfolio-images')
-                          .getPublicUrl(uploadData.path);
-                        const newProjects = [...data.projects];
-                        newProjects[index] = { ...newProjects[index], coverImage: publicUrl };
-                        setData({ ...data, projects: newProjects });
-                        setMessage('');
+                        try {
+                          setLoading(true);
+                          setMessage('');
+                          const publicUrl = await uploadImage(file);
+
+                          if (!publicUrl) {
+                            return;
+                          }
+
+                          const newProjects = [...data.projects];
+                          newProjects[index] = { ...newProjects[index], coverImage: publicUrl };
+                          setData({ ...data, projects: newProjects });
+                        } finally {
+                          setLoading(false);
+                        }
                       }}
                       className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none"
                     />
@@ -463,31 +530,28 @@ export default function CrudAdmin() {
                       onChange={async (e) => {
                         const files = Array.from(e.target.files || []);
                         if (!files.length) return;
-                        if (!supabase) {
-                          setMessage('Supabase não configurado para upload');
-                          return;
-                        }
-                        const newGalleryImages: string[] = [...project.galleryImages];
-                        for (const file of files) {
-                          const fileName = `${Date.now()}-${file.name}`;
-                          const { data: uploadData, error } = await supabase.storage
-                            .from('portfolio-images')
-                            .upload(fileName, file);
-                          if (error || !uploadData) {
-                            console.error('Error uploading file:', error);
-                            setMessage('Erro ao fazer upload da imagem');
-                            return;
+
+                        try {
+                          setLoading(true);
+                          setMessage('');
+                          const newGalleryImages: string[] = [...project.galleryImages];
+
+                          for (const file of files) {
+                            const publicUrl = await uploadImage(file);
+
+                            if (!publicUrl) {
+                              return;
+                            }
+
+                            newGalleryImages.push(publicUrl);
                           }
 
-                          const { data: { publicUrl } } = supabase.storage
-                            .from('portfolio-images')
-                            .getPublicUrl(uploadData.path);
-                          newGalleryImages.push(publicUrl);
+                          const newProjects = [...data.projects];
+                          newProjects[index] = { ...newProjects[index], galleryImages: newGalleryImages };
+                          setData({ ...data, projects: newProjects });
+                        } finally {
+                          setLoading(false);
                         }
-                        const newProjects = [...data.projects];
-                        newProjects[index] = { ...newProjects[index], galleryImages: newGalleryImages };
-                        setData({ ...data, projects: newProjects });
-                        setMessage('');
                       }}
                       className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none"
                     />

@@ -1,22 +1,13 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { createClient } from '@supabase/supabase-js';
-
-function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceRoleKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceRoleKey);
-}
+import {
+  getSupabaseServerClient,
+  hasSupabaseServerConfig,
+} from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   console.log('Contact form API called!');
   try {
-    const supabase = getSupabaseClient();
     const body = await request.json();
     console.log('Received form data:', body);
     const { name, email, company, service, message } = body;
@@ -29,17 +20,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save to Supabase first
-    if (supabase) {
-      const { error: supabaseError } = await supabase
-        .from('contact_messages')
-        .insert([{ name, email, company, service, message }]);
+    if (!hasSupabaseServerConfig()) {
+      return NextResponse.json(
+        { success: false, error: 'Supabase não configurado no ambiente.' },
+        { status: 500 }
+      );
+    }
 
-      if (supabaseError) {
-        console.error('Error saving to Supabase:', supabaseError);
-      }
-    } else {
-      console.error('Missing Supabase environment variables');
+    // Save to Supabase first
+    const supabase = getSupabaseServerClient();
+    const { error: supabaseError } = await supabase
+      .from('contact_messages')
+      .insert([{ name, email, company, service, message }]);
+
+    if (supabaseError) {
+      console.error('Error saving to Supabase:', supabaseError);
+      return NextResponse.json(
+        { success: false, error: 'Erro ao salvar mensagem no Supabase.' },
+        { status: 500 }
+      );
     }
 
     // Check environment variables for email
