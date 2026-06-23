@@ -5,19 +5,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import BreadcrumbListSchema from '@/components/schema/BreadcrumbListSchema';
-import { type Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Blog | dois.du - Dicas de Design, Marketing e TI em Porto Alegre',
-  description: 'Dicas e artigos sobre design gráfico, marketing digital, tecnologia da informação e negócios em Porto Alegre, RS. Conteúdo útil para empreendedores.',
-  keywords: 'blog design Porto Alegre, marketing digital RS, dicas de TI, empreendedorismo RS',
-  openGraph: {
-    title: 'Blog | dois.du - Dicas de Design, Marketing e TI',
-    description: 'Dicas e artigos sobre design gráfico, marketing digital, tecnologia da informação e negócios em Porto Alegre, RS.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://doisdu.com.br'}/blog`,
-    type: 'website',
-  }
-};
 
 // Dados de exemplo para o blog (serão substituídos por dados do Supabase no futuro)
 const blogPosts = [

@@ -6,19 +6,6 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import BreadcrumbListSchema from '@/components/schema/BreadcrumbListSchema';
 import ServiceSchema from '@/components/schema/ServiceSchema';
-import { type Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Manutenção de Notebooks em Porto Alegre | dois.du',
-  description: 'Manutenção especializada em notebooks em Porto Alegre, RS. Troca de tela, bateria, teclado, SSD e muito mais. Orçamento gratuito!',
-  keywords: 'manutenção notebook Porto Alegre, conserto notebook RS, troca tela notebook, troca bateria notebook',
-  openGraph: {
-    title: 'Manutenção de Notebooks em Porto Alegre | dois.du',
-    description: 'Manutenção especializada em notebooks em Porto Alegre, RS. Troca de tela, bateria, teclado, SSD e muito mais.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://doisdu.com.br'}/manutencao-de-notebooks`,
-    type: 'website',
-  }
-};
 
 export default function ManutencaoDeNotebooks() {
   return (

@@ -18,6 +18,10 @@ type SiteSettings = {
 
 type Data = {
   siteSettings: SiteSettings;
+  site?: {
+    name: string;
+    description: string;
+  } | null;
   home: {
     title: string;
     description: string;

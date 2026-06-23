@@ -423,6 +423,10 @@ export default function CrudAdmin() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
+                        if (!supabase) {
+                          setMessage('Supabase não configurado para upload');
+                          return;
+                        }
                         const fileName = `${Date.now()}-${file.name}`;
                         const { data: uploadData, error } = await supabase.storage
                           .from('portfolio-images')
@@ -459,6 +463,10 @@ export default function CrudAdmin() {
                       onChange={async (e) => {
                         const files = Array.from(e.target.files || []);
                         if (!files.length) return;
+                        if (!supabase) {
+                          setMessage('Supabase não configurado para upload');
+                          return;
+                        }
                         const newGalleryImages: string[] = [...project.galleryImages];
                         for (const file of files) {
                           const fileName = `${Date.now()}-${file.name}`;
